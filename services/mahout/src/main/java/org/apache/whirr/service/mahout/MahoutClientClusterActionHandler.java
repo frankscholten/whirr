@@ -32,15 +32,15 @@ import static org.jclouds.scriptbuilder.domain.Statements.call;
  */
 public class MahoutClientClusterActionHandler extends ClusterActionHandlerSupport {
 
-  static String MAHOUT_CLIENT_ROLE = "mahout-client";
+  final static String MAHOUT_CLIENT_ROLE = "mahout-client";
 
-  static String MAHOUT_DEFAULT_PROPERTIES = "whirr-mahout-default.properties";
+  final static String MAHOUT_DEFAULT_PROPERTIES = "whirr-mahout-default.properties";
 
-  static String MAHOUT_TAR_URL = "whirr.mahout.tarball.url";
+  final static String MAHOUT_TAR_URL = "whirr.mahout.tarball.url";
 
-  static String MAHOUT_CLIENT_SCRIPT = "configure_mahout_client";
+  final static String MAHOUT_CLIENT_SCRIPT = "configure_mahout_client";
 
-  static String URL_FLAG = "-u";
+  final static String URL_FLAG = "-u";
 
   @Override
   public String getRole() {
