@@ -56,11 +56,42 @@ Trunk (unreleased changes)
 
     WHIRR-423. Refactor StartupProcess.cleanupFailedNodes (Adrian Cole via asavu)
 
+    WHIRR-398. Implement the execution of scripts on DestroyClusterAction 
+    (David Alves via asavu)
+
+    WHIRR-399. Move common script setup and script execution fork/join outside of 
+    ConfigureClusterAction and DestroyClusterAction (David Alves via asavu)
+
+    WHIRR-417. Allow users to choose their own jclouds modules with properties 
+    (Adrian Cole via asavu)
+
+    WHIRR-420. Document jclouds specific configuration options (David Alves via asavu)
+
+    WHIRR-419. Display how to connect to remote machines (David Alves via asavu)
+
+    WHIRR-426. Create a convention for naming clusters used for integration 
+    tests (asavu)
+
+    WHIRR-409. Add an integration test that shows that there is no overlap 
+    between install & configure scripts on the remote machine (asavu)
+
+    WHIRR-408. Upgrade elasticsearch to 0.18.2 (asavu)
+
+    WHIRR-414. Wirr can have a non-zero return code and unterminated 
+    (orphaned) host instances (David Alves and asavu)
+
   BUG FIXES
 
     WHIRR-377. Fix broken CLI logging config. (asavu via tomwhite)
 
     WHIRR-394. NPE used for flow control (David Alves via asavu)
+
+    WHIRR-410. Review automatic image selection 
+    (Adrian Cole, Alex Heneveld, David Alves and Andrei Savu)
+    * we have discovered that we are flooding the remote machines with status 
+    requests and a small instance like t1.micro is unable to cope with that
+
+    WHIRR-352. mvn package assembly:assembly fails (David Alves via asavu)
 
 Release 0.6.0 - 2011-08-17
 

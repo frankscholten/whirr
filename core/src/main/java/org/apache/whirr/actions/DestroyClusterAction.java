@@ -21,10 +21,11 @@ package org.apache.whirr.actions;
 import static org.jclouds.compute.predicates.NodePredicates.inGroup;
 
 import java.io.IOException;
+import java.util.Map;
 
-import org.apache.whirr.Cluster;
-import org.apache.whirr.ClusterAction;
 import org.apache.whirr.ClusterSpec;
+import org.apache.whirr.InstanceTemplate;
+import org.apache.whirr.service.ClusterActionEvent;
 import org.apache.whirr.service.ClusterActionHandler;
 import org.jclouds.compute.ComputeService;
 import org.jclouds.compute.ComputeServiceContext;
@@ -34,16 +35,18 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Function;
 
 /**
- * A {@link ClusterAction} for tearing down a running cluster and freeing up
- * all its resources.
+ * A {@link ClusterAction} for tearing down a running cluster and freeing up all
+ * its resources.
  */
-public class DestroyClusterAction extends ClusterAction {
+public class DestroyClusterAction extends ScriptBasedClusterAction {
 
-  private static final Logger LOG =
-    LoggerFactory.getLogger(DestroyClusterAction.class);
-  
-  public DestroyClusterAction(Function<ClusterSpec, ComputeServiceContext> getCompute) {
-    super(getCompute);
+  private static final Logger LOG = LoggerFactory
+      .getLogger(DestroyClusterAction.class);
+
+  public DestroyClusterAction(
+      final Function<ClusterSpec, ComputeServiceContext> getCompute,
+      final Map<String, ClusterActionHandler> handlerMap) {
+    super(getCompute, handlerMap);
   }
 
   @Override
@@ -52,13 +55,15 @@ public class DestroyClusterAction extends ClusterAction {
   }
 
   @Override
-  public Cluster execute(ClusterSpec clusterSpec, Cluster cluster)
-      throws IOException, InterruptedException {
+  protected void postRunScriptsActions(
+      Map<InstanceTemplate, ClusterActionEvent> eventMap) throws IOException {
+    ClusterSpec clusterSpec = eventMap.values().iterator().next()
+        .getClusterSpec();
     LOG.info("Destroying " + clusterSpec.getClusterName() + " cluster");
-    ComputeService computeService = getCompute().apply(clusterSpec).getComputeService();
+    ComputeService computeService = getCompute().apply(clusterSpec)
+        .getComputeService();
     computeService.destroyNodesMatching(inGroup(clusterSpec.getClusterName()));
     LOG.info("Cluster {} destroyed", clusterSpec.getClusterName());
-    return null;
   }
 
 }
