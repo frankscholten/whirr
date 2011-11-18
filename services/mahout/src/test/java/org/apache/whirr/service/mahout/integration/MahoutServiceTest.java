@@ -18,9 +18,9 @@
 package org.apache.whirr.service.mahout.integration;
 
 import com.google.common.base.Predicate;
-import com.google.common.base.Predicates;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.whirr.Cluster;
 import org.apache.whirr.ClusterController;
 import org.apache.whirr.ClusterSpec;
 import org.jclouds.compute.domain.ExecResponse;
@@ -36,8 +36,11 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.Map;
 
-import static com.google.common.base.Predicates.alwaysTrue;
+import static com.google.common.base.Predicates.*;
+import static com.google.common.collect.Collections2.filter;
+import static com.google.common.collect.Iterables.getOnlyElement;
 import static junit.framework.Assert.failNotEquals;
+import static org.apache.whirr.RolePredicates.role;
 import static org.jclouds.compute.predicates.NodePredicates.withIds;
 
 /**
@@ -73,7 +76,9 @@ public class MahoutServiceTest {
   public void testBuildReuters() throws Exception {
     Statement buildReuters = Statements.exec("echo 1 | $MAHOUT_HOME/examples/bin/build-reuters.sh");
 
-    Predicate<NodeMetadata> mahoutClientRole = Predicates.and(alwaysTrue(), withIds("mahout-client"));
+    Cluster.Instance mahoutInstance = getOnlyElement(filter(controller.getInstances(clusterSpec), role("mahout-client")));
+    Predicate<NodeMetadata> mahoutClientRole = and(alwaysTrue(), withIds(mahoutInstance.getId()));
+
     Map<? extends NodeMetadata, ExecResponse> responses = controller.runScriptOnNodesMatching(clusterSpec, mahoutClientRole, buildReuters);
 
     LOG.info("Responses for Statement: " + buildReuters);
