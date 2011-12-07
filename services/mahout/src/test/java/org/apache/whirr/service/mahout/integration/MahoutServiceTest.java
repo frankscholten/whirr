@@ -23,6 +23,7 @@ import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.whirr.Cluster;
 import org.apache.whirr.ClusterController;
 import org.apache.whirr.ClusterSpec;
+import org.apache.whirr.service.ClusterStateStoreFactory;
 import org.jclouds.compute.domain.ExecResponse;
 import org.jclouds.compute.domain.NodeMetadata;
 import org.jclouds.scriptbuilder.domain.Statement;
@@ -36,11 +37,12 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.Map;
 
-import static com.google.common.base.Predicates.*;
-import static com.google.common.collect.Collections2.filter;
-import static com.google.common.collect.Iterables.getOnlyElement;
+import static com.google.common.base.Predicates.alwaysTrue;
+import static com.google.common.base.Predicates.and;
+import static com.google.common.collect.Sets.newHashSet;
 import static junit.framework.Assert.failNotEquals;
-import static org.apache.whirr.RolePredicates.role;
+import static org.apache.whirr.RolePredicates.anyRoleIn;
+import static org.apache.whirr.service.mahout.MahoutClientClusterActionHandler.MAHOUT_CLIENT_ROLE;
 import static org.jclouds.compute.predicates.NodePredicates.withIds;
 
 /**
@@ -74,29 +76,33 @@ public class MahoutServiceTest {
 
   @Test
   public void testBuildReuters() throws Exception {
-    Statement buildReuters = Statements.exec("echo 1 | $MAHOUT_HOME/examples/bin/build-reuters.sh");
+    Statement binMahout = Statements.exec("source /etc/profile; $MAHOUT_HOME/bin/mahout");
 
-    Cluster.Instance mahoutInstance = getOnlyElement(filter(controller.getInstances(clusterSpec), role("mahout-client")));
+    Cluster.Instance mahoutInstance = findMahoutInstance();
     Predicate<NodeMetadata> mahoutClientRole = and(alwaysTrue(), withIds(mahoutInstance.getId()));
 
-    Map<? extends NodeMetadata, ExecResponse> responses = controller.runScriptOnNodesMatching(clusterSpec, mahoutClientRole, buildReuters);
+    Map<? extends NodeMetadata, ExecResponse> responses = controller.runScriptOnNodesMatching(clusterSpec, mahoutClientRole, binMahout);
 
-    LOG.info("Responses for Statement: " + buildReuters);
+    LOG.info("Responses for Statement: " + binMahout);
     for (Map.Entry<? extends NodeMetadata, ExecResponse> entry : responses.entrySet()) {
       LOG.info("Node[" + entry.getKey().getId() + "]: " + entry.getValue());
     }
 
-    assertResponsesContain(responses, buildReuters, "Program took ");
+    assertResponsesContain(responses, binMahout, "Running on hadoop");
   }
 
-  public static void assertResponsesContain(
-      Map<? extends NodeMetadata, ExecResponse> responses, Statement statement, String text) {
+  public static void assertResponsesContain(Map<? extends NodeMetadata, ExecResponse> responses, Statement statement, String text) {
     for (Map.Entry<? extends NodeMetadata, ExecResponse> entry : responses.entrySet()) {
-      if (!entry.getValue().getOutput().contains(text)) {
-        failNotEquals("Node: " + entry.getKey().getId()
-            + " failed to execute the command: " + statement
-            + " as could not find expected text", text, entry.getValue());
-      }
+        if (!entry.getValue().getOutput().contains(text)) {
+            failNotEquals("Node: " + entry.getKey().getId()
+                    + " failed to execute the command: " + statement
+                    + " as could not find expected text", text, entry.getValue());
+        }
     }
+  }
+
+  private Cluster.Instance findMahoutInstance() throws IOException {
+      Cluster cluster = new ClusterStateStoreFactory().create(clusterSpec).load();
+      return cluster.getInstanceMatching(anyRoleIn(newHashSet(MAHOUT_CLIENT_ROLE)));
   }
 }

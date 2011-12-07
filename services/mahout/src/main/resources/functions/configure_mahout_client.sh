@@ -32,6 +32,6 @@ function configure_mahout_client() {
   install_tarball $MAHOUT_TAR_URL
   ln -s $MAHOUT_HOME /usr/local/mahout
 
-  echo "export MAHOUT_HOME=$MAHOUT_HOME" >> ~root/.bashrc
-  echo 'export PATH=$MAHOUT_HOME/bin:$PATH' >> ~root/.bashrc
+  echo "export MAHOUT_HOME=$MAHOUT_HOME" >> /etc/profile
+  echo 'export PATH=$MAHOUT_HOME/bin:$PATH' >> /etc/profile
 }

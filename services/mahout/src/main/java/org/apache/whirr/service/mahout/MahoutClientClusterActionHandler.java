@@ -32,7 +32,7 @@ import static org.jclouds.scriptbuilder.domain.Statements.call;
  */
 public class MahoutClientClusterActionHandler extends ClusterActionHandlerSupport {
 
-  final static String MAHOUT_CLIENT_ROLE = "mahout-client";
+  public final static String MAHOUT_CLIENT_ROLE = "mahout-client";
 
   final static String MAHOUT_DEFAULT_PROPERTIES = "whirr-mahout-default.properties";
 

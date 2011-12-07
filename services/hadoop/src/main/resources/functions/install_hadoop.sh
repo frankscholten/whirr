@@ -53,7 +53,10 @@ function install_hadoop() {
 
   echo "export HADOOP_HOME=$HADOOP_HOME" >> ~root/.bashrc
   echo 'export PATH=$JAVA_HOME/bin:$HADOOP_HOME/bin:$PATH' >> ~root/.bashrc
-  
+
+  echo "export HADOOP_HOME=$HADOOP_HOME" >> /etc/profile
+  echo 'export PATH=$JAVA_HOME/bin:$HADOOP_HOME/bin:$PATH' >> /etc/profile
+
   INSTALL_HADOOP_DONE=1
 }
 
