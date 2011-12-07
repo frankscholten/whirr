@@ -75,7 +75,7 @@ public class MahoutServiceTest {
   }
 
   @Test
-  public void testBuildReuters() throws Exception {
+  public void testBinMahout() throws Exception {
     Statement binMahout = Statements.exec("source /etc/profile; $MAHOUT_HOME/bin/mahout");
 
     Cluster.Instance mahoutInstance = findMahoutInstance();
