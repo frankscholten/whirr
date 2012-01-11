@@ -40,6 +40,7 @@
     <module>cli</module>
     <module>core</module>
     <module>examples</module>
+    <module>integration</module>
     <module>services/cassandra</module>
     <module>services/cdh</module>
     <module>services/ganglia</module>
