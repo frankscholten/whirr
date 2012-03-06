@@ -49,7 +49,7 @@ public class SolrActionHandler extends ClusterActionHandlerSupport {
   public static final String SOLR_ROLE = "solr";
   private static final String CONFIG = "whirr-solr-default.properties";
   private static final String SOLR_HOME = "/usr/local/solr-4.0";
-  private static final String SOLR_CONF = SOLR_HOME + "/conf";
+  private static final String SOLR_CONF_DESTINATION = SOLR_HOME + "/conf";
 
   @Override
   public String getRole() {
@@ -118,7 +118,7 @@ public class SolrActionHandler extends ClusterActionHandlerSupport {
 
     String solrConfigSource = prepareRemoteFileUrl(event, config.getString("whirr.solr.conf"));
 
-    addStatement(event, call("upload_file", solrConfigSource, SOLR_CONF));
+    addStatement(event, call("move_file", solrConfigSource, SOLR_CONF_DESTINATION));
 
     addStatement(event, call(startFunc,
         String.valueOf(jettyPort),

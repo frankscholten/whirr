@@ -14,12 +14,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-
-function upload_file() {
+function move_file() {
   if [[ "$1" != "" && "$2" != "" ]]; then
-    local source_file=$1
-    local dest_file=$2
+    local source_file="$1"
+    local dest_dir="$2"
 
-    cp "$1" -p "$2"
+    mkdir -p $dest_dir
+    cp $source_file $dest_dir
   fi
 }
