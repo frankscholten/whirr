@@ -42,20 +42,22 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 
-public class SolrActionHandler extends ClusterActionHandlerSupport {
+public class SolrClusterActionHandler extends ClusterActionHandlerSupport {
 
-  private static final Logger LOG = LoggerFactory.getLogger(SolrActionHandler.class);
+  private static final Logger LOG = LoggerFactory.getLogger(SolrClusterActionHandler.class);
 
-  public static final String SOLR_ROLE = "solr";
-  private static final String CONFIG = "whirr-solr-default.properties";
-  private static final String SOLR_HOME = "/usr/local/solr-4.0";
-  private static final String SOLR_CONF_DESTINATION = SOLR_HOME + "/conf";
+  public final static String SOLR_ROLE = "solr";
+
+  final static String CONFIG = "whirr-solr-default.properties";
+
+  final static String SOLR_HOME = "/usr/local/solr-4.0";
+
+  final static String SOLR_CONF_DESTINATION = SOLR_HOME + "/conf";
 
   @Override
   public String getRole() {
     return SOLR_ROLE;
   }
-
 
   @Override
   protected void beforeBootstrap(ClusterActionEvent event) throws IOException {
@@ -71,11 +73,10 @@ public class SolrActionHandler extends ClusterActionHandlerSupport {
     addStatement(event, call("install_tarball"));
 
     String installFunc = getInstallFunction(config, getRole(), "install_" + getRole());
+
     LOG.info("Installing Solr");
-    addStatement(event, call(installFunc,
-        solrTarball,
-        SOLR_HOME
-    ));
+
+    addStatement(event, call(installFunc, solrTarball, SOLR_HOME));
   }
 
   @Override
@@ -163,21 +164,28 @@ public class SolrActionHandler extends ClusterActionHandlerSupport {
   }
 
   static List<String> getHosts(Set<Instance> instances, final int port) {
-    return Lists.transform(Lists.newArrayList(instances), new Function<Instance, String>(){
-      @Override
-      public String apply(Instance instance) {
-        try {
-          String publicIp = instance.getPublicHostName();
-          return String.format("%s:%d", publicIp, port);
-        } catch (IOException e) {
-          throw new IllegalArgumentException(e);
-        }
-      }
-    });
+    return Lists.transform(Lists.newArrayList(instances), new GetPublicIpFunction(port));
   }
 
   static String safeSecretString(String value) throws IOException {
     return CryptoStreams.md5Hex(newInputStreamSupplier(("NaCl#" + value).getBytes()));
   }
 
+  private static class GetPublicIpFunction implements Function<Instance, String> {
+    private final int port;
+
+    public GetPublicIpFunction(int port) {
+      this.port = port;
+    }
+
+    @Override
+    public String apply(Instance instance) {
+      try {
+        String publicIp = instance.getPublicHostName();
+        return String.format("%s:%d", publicIp, port);
+      } catch (IOException e) {
+        throw new IllegalArgumentException(e);
+      }
+    }
+  }
 }
