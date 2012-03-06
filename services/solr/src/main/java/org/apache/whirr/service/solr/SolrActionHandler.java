@@ -108,6 +108,13 @@ public class SolrActionHandler extends ClusterActionHandlerSupport {
     ClusterSpec clusterSpec = event.getClusterSpec();
     Cluster cluster = event.getCluster();
     Configuration config = getConfiguration(clusterSpec, CONFIG);
+
+    String solrConfigSource = prepareRemoteFileUrl(event, config.getString("whirr.solr.config"));
+    addStatement(event, call("move_file", solrConfigSource, SOLR_CONF_DESTINATION));
+
+    String solrSchemaSource = prepareRemoteFileUrl(event, config.getString("whirr.solr.schema"));
+    addStatement(event, call("move_file", solrSchemaSource, SOLR_CONF_DESTINATION));
+
     int jettyPort = config.getInt("whirr.solr.jetty.port");
     int jettyStopPort = config.getInt("whirr.solr.jetty.stop.port");
     String zkEnsemble = ZooKeeperCluster.getHosts(cluster);
@@ -115,10 +122,6 @@ public class SolrActionHandler extends ClusterActionHandlerSupport {
     // Start up Solr
     String startFunc = getStartFunction(config, getRole(), "start_" + getRole());
     LOG.info("Starting up Solr");
-
-    String solrConfigSource = prepareRemoteFileUrl(event, config.getString("whirr.solr.conf"));
-
-    addStatement(event, call("move_file", solrConfigSource, SOLR_CONF_DESTINATION));
 
     addStatement(event, call(startFunc,
         String.valueOf(jettyPort),
