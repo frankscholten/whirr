@@ -50,7 +50,7 @@ public class SolrClusterActionHandler extends ClusterActionHandlerSupport {
 
   final static String CONFIG = "whirr-solr-default.properties";
 
-  final static String SOLR_HOME = "/usr/local/solr-4.0";
+  final static String SOLR_HOME = "/usr/local/solr";
 
   final static String SOLR_CONF_DESTINATION = SOLR_HOME + "/conf";
 
@@ -65,11 +65,11 @@ public class SolrClusterActionHandler extends ClusterActionHandlerSupport {
     Configuration config = getConfiguration(clusterSpec, CONFIG);
 
     String solrTarball = config.getString("whirr.solr.tarball");
-    if(!solrTarball.matches("^.*apache-solr-4\\.0.*(tgz|tar\\.gz)$")) {
-      throw new IllegalArgumentException("Must specify a Solr 4.0 tarball");
+    if(!solrTarball.matches("^.*apache-solr-.*(tgz|tar\\.gz)$")) {
+      throw new IllegalArgumentException("Must specify a Solr tarball");
     }
     // Call the installers
-    addStatement(event, call(getInstallFunction(config, "java", "install_java")));
+    addStatement(event, call(getInstallFunction(config, "java", "install_openjdk")));
     addStatement(event, call("install_tarball"));
 
     String installFunc = getInstallFunction(config, getRole(), "install_" + getRole());
@@ -110,11 +110,8 @@ public class SolrClusterActionHandler extends ClusterActionHandlerSupport {
     Cluster cluster = event.getCluster();
     Configuration config = getConfiguration(clusterSpec, CONFIG);
 
-    String solrConfigSource = prepareRemoteFileUrl(event, config.getString("whirr.solr.config"));
-    addStatement(event, call("move_file", solrConfigSource, SOLR_CONF_DESTINATION));
-
-    String solrSchemaSource = prepareRemoteFileUrl(event, config.getString("whirr.solr.schema"));
-    addStatement(event, call("move_file", solrSchemaSource, SOLR_CONF_DESTINATION));
+    String solrConfigTarball = prepareRemoteFileUrl(event, config.getString("whirr.solr.config.tarball"));
+    addStatement(event, call("install_tarball", solrConfigTarball, SOLR_CONF_DESTINATION));
 
     int jettyPort = config.getInt("whirr.solr.jetty.port");
     int jettyStopPort = config.getInt("whirr.solr.jetty.stop.port");
