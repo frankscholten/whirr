@@ -1,0 +1,20 @@
+Vagrant::Config.run do |config|
+
+  config.vm.define :zookeeper do |zookeeper|
+        zookeeper.vm.box = "lucid64"
+        zookeeper.vm.box_url = "http://files.vagrantup.com/lucid64.box"
+        zookeeper.vm.network :hostonly, "192.168.30.30"
+  end
+
+  config.vm.define :solr1 do |solr1|
+        solr1.vm.box = "lucid64"
+        solr1.vm.box_url = "http://files.vagrantup.com/lucid64.box"
+	      solr1.vm.network :hostonly, "192.168.31.31"
+  end
+
+  config.vm.define :solr2 do |solr2|
+        solr2.vm.box = "lucid64"
+        solr2.vm.box_url = "http://files.vagrantup.com/lucid64.box"
+        solr2.vm.network :hostonly, "192.168.32.32"
+  end
+end

@@ -69,7 +69,7 @@ public class SolrServiceTest {
     if (System.getProperty("config") != null) {
       config.addConfiguration(new PropertiesConfiguration(System.getProperty("config")));
     }
-    config.addConfiguration(new PropertiesConfiguration("whirr-solr-test.properties"));
+    config.addConfiguration(new PropertiesConfiguration("whirr-solr-byon.properties"));
     clusterSpec = ClusterSpec.withTemporaryKeys(config);
     controller = new ClusterController();
 
