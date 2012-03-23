@@ -14,5 +14,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-
-version=${project.version}
+function start_yarn() {
+  if which dpkg &> /dev/null; then
+    AS_HADOOP="su -s /bin/bash - hadoop -c"
+  elif which rpm &> /dev/null; then
+    AS_HADOOP="/sbin/runuser -s /bin/bash - hadoop -c"
+  fi
+  if [[ $1 == 'nodemanager' ]]; then
+    sleep 60 # give RM a chance to start in absence of WHIRR-221
+  fi
+  $AS_HADOOP "$HADOOP_HOME/sbin/yarn-daemon.sh start $1"
+}

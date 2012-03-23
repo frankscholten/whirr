@@ -7,7 +7,13 @@ Trunk (unreleased changes)
     WHIRR-500. Let users control which hardware is used for each 
     instance template (Karel Vervaeke via asavu)
 
+    WHIRR-531. Add Pig as a service (Marco Didonna, Andrei Savu)
+
+    WHIRR-335. Update Hama service to Hama 0.4-incubating (Edward J. Yoon via Frank Scholten)
+
   IMPROVEMENTS
+
+    WHIRR-556. Improve the 'Running on $PROVIDER using $IDENTITY' message (kve)
 
     WHIRR-514. Avoid hardcoded Whirr version number in karaf tests (kve)
     (orig: Update release instructions or fix update-version script?)
@@ -44,13 +50,6 @@ Trunk (unreleased changes)
 
     WHIRR-493. Test override number of mappers for Hadoop (asavu)
 
-    WHIRR-454. Allow openjdk to be installed as an alternative 
-    to sun-java-6 (Karel Vervaeke via asavu)
-
-    WHIRR-439. Make proxy files executable (Marco Didonna via asavu)
-
-    WHIRR-498. Update the list of known limitations (asavu)
-
     WHIRR-436. Allow Whirr to run from inside OSGi (Ioannis Canellos via asavu)
 
     WHIRR-422. Integration tests should fail or succeed in a limited 
@@ -59,23 +58,68 @@ Trunk (unreleased changes)
     WHIRR-347. Support provider-independent environment variables for 
     cloud credentials (asavu)
 
-    WHIRR-463. Fail fast when running as root (asavu)
-
     WHIRR-35. Include .pac file for browsing to Hadoop clusters 
     started on EC2 (asavu)
 
-    WHIRR-507. Make whirr script executable from any path (Marco Didonna via asavu)
+    WHIRR-509. Provide live OSGi integration tests (Ioannis Canellos, Andrei Savu)
 
-    WHIRR-518. Change to OpenJDK (Frank Scholten via asavu)
+    WHIRR-542. Only expose start / stop / restart as new CLI commands (Andrei Savu)
+
+    WHIRR-550. Upgrade Mahout service to 0.6 (Frank Scholten)
+
+    WHIRR-554. Upgrade elasticsearch to 0.19.0 (Andrei Savu)
+
+    WHIRR-553. Upgrade Cassandra to 1.0.8 (Andrei Savu)
+
+    WHIRR-551. Upgrade to jclouds 1.3.2 (Andrei Savu)
+
+    WHIRR-464. Do not fail if whirr.cluster-user already exists on the 
+    remote machine (Rodrigo Duarte Sousa via Andrei Savu)
+
+    WHIRR-374. Enforce Maven 3 (Tom White via Andrei Savu)
 
   BUG FIXES
 
-    WHIRR-367. Wrong groupId for zookeeper (Joe Crobak via asavu)
-
-    WHIRR-460. Error while running whirr on Cygwin (Akash Ashok via asavu)
+    WHIRR-555. Fix java install script: $(...) -> `...` (kve)
 
     WHIRR-473. HadoopServiceController.getInstance(String config) does 
     not update instances correctly (Frank Scholten via asavu)
+
+    WHIRR-496. Documentation in 5-Minute guide is missing key 
+    option for destroy step (asavu)  
+
+    WHIRR-510. Get ZooKeeper ensemble with internal addresses 
+    (David Arthur via asavu)
+
+    WHIRR-524. Change confusing 'Starting cluster' message (Frank Scholten via asavu)
+
+    WHIRR-536. Using SNAPSHOT versions of jclouds breaks OSGi 
+    support (Ioannis Canellos, Andrei Savu)
+
+    WHIRR-549. Remove dependency on system SSH keys in tests (Frank Scholten)
+
+Release 0.7.1 - 2012-02-23
+
+  IMPROVEMENTS
+
+    WHIRR-507. Make whirr script executable from any path 
+    (Marco Didonna via asavu)
+
+    WHIRR-439. Make proxy files executable (Marco Didonna via asavu)
+
+    WHIRR-498. Update the list of known limitations (asavu)
+
+    WHIRR-463. Fail fast when running as root (asavu)
+
+    WHIRR-454. Allow openjdk to be installed as an alternative 
+    to sun-java-6 (Karel Vervaeke via asavu)
+
+    WHIRR-526. Don't log harmless sshj errors to console (asavu)
+    
+  BUG FIXES
+
+    WHIRR-502. configure_cdh_hadoop.sh: syntax error trying to 
+    modify permissions on $HADOOP_LOG_DIR (asavu)
 
     WHIRR-490. hadoop-mapreduce.mapred.child.ulimit should be 
     unlimited by default (asavu)
@@ -83,18 +127,13 @@ Trunk (unreleased changes)
     WHIRR-495. bin/whirr is does not have executable permissions 
     in the 0.7.0 pre-built download (asavu)
 
-    WHIRR-496. Documentation in 5-Minute guide is missing key 
-    option for destroy step (asavu)  
+    WHIRR-367. Wrong groupId for zookeeper (Joe Crobak via asavu)
 
-    WHIRR-502. configure_cdh_hadoop.sh: syntax error trying to modify 
-    permissions on $HADOOP_LOG_DIR (asavu)
-
-    WHIRR-510. Get ZooKeeper ensemble with internal addresses 
-    (David Arthur via asavu)
+    WHIRR-460. Error while running whirr on Cygwin (Akash Ashok via asavu)
 
     WHIRR-520. Using OAB script to install sun jdk (Marco Didonna via asavu)
 
-    WHIRR-524. Change confusing 'Starting cluster' message (Frank Scholten via asavu)
+    WHIRR-518. Change to OpenJDK (Frank Scholten, Tom White, Andrei Savu)
 
 Release 0.7.0 - 2011-12-11
 
