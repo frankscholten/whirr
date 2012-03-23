@@ -435,6 +435,8 @@
             <exclude>**/.settings/**</exclude>
             <exclude>**/target/**</exclude>
             <exclude>src/site/resources/images/whirr-logo.ai</exclude>
+            <exclude>**/.vagrant</exclude>
+            <exclude>**/Vagrantfile</exclude>
             <!-- binary -->
           </excludes>
         </configuration>
