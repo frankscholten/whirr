@@ -14,12 +14,34 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-function move_file() {
-  if [[ "$1" != "" && "$2" != "" ]]; then
-    local source_file="$1"
-    local dest_dir="$2"
+function install_tarball_no_md5() {
+  if [[ "$1" != "" ]]; then
+    # Download a .tar.gz file and extract to target dir
 
-    mkdir -p $dest_dir
-    cp $source_file $dest_dir
+    local tar_url=$1
+    local tar_file=`basename $tar_url`
+
+    local target=${2:-/usr/local/}
+    mkdir -p $target
+
+    local curl="curl -L --silent --show-error --fail --connect-timeout 10 --max-time 600 --retry 5"
+    # any download should take less than 10 minutes
+
+    for retry_count in `seq 1 3`;
+    do
+      $curl -O $tar_url || true
+
+      if [ ! $retry_count -eq "3" ]; then
+        sleep 10
+      fi
+    done
+
+    if [ ! -e $tar_file ]; then
+      echo "Failed to download $tar_file. Aborting."
+      exit 1
+    fi
+
+    tar xzf $tar_file -C $target
+    rm -f $tar_file
   fi
 }

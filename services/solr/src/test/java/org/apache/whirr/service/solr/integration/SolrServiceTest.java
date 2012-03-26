@@ -61,15 +61,15 @@ public class SolrServiceTest {
 
   @BeforeClass
   public static void beforeClass() throws ConfigurationException, JSchException, IOException, InterruptedException {
-    String tarballDestination = "target/solrconfig.tar.gz";
-    Tarball.createFromDirectory("src/test/resources/config", tarballDestination);
-    LOG.info("Created Solr config tarball at "  + tarballDestination);
+    String solrConfigTarballDestination = "target/solrconfig.tar.gz";
+    Tarball.createFromDirectory("src/test/resources/config", solrConfigTarballDestination);
+    LOG.info("Created Solr tarball at "  + solrConfigTarballDestination);
 
     CompositeConfiguration config = new CompositeConfiguration();
-    if (System.getProperty("config") != null) {
-      config.addConfiguration(new PropertiesConfiguration(System.getProperty("config")));
+    if (System.getProperty("conf") != null) {
+      config.addConfiguration(new PropertiesConfiguration(System.getProperty("conf")));
     }
-    config.addConfiguration(new PropertiesConfiguration("whirr-solr-byon.properties"));
+    config.addConfiguration(new PropertiesConfiguration("whirr-solr-test.properties"));
     clusterSpec = ClusterSpec.withTemporaryKeys(config);
     controller = new ClusterController();
 
@@ -85,7 +85,7 @@ public class SolrServiceTest {
 
       LOG.info("Adding a document to instance " + instance.getId() + " @ " + publicIp);
       
-      CommonsHttpSolrServer solrServer = new CommonsHttpSolrServer(String.format("http://%s%s", publicIp, SOLR_PORT));
+      CommonsHttpSolrServer solrServer = new CommonsHttpSolrServer(String.format("http://%s:%s/solr", instance.getPublicHostName(), SOLR_PORT));
 
       SolrInputDocument doc = new SolrInputDocument();
       doc.addField("name", "Apache Whirr");

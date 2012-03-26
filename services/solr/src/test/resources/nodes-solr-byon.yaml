@@ -26,6 +26,7 @@ nodes:
       username: vagrant
       credential: vagrant
       sudo_password:
+      group: whirr
     - id: solr1
       description: solr
       hostname: 192.168.31.31
@@ -36,6 +37,7 @@ nodes:
       username: vagrant
       credential: vagrant
       sudo_password:
+      group: whirr
     - id: solr2
       description: solr
       hostname: 192.168.32.32
@@ -46,3 +48,4 @@ nodes:
       username: vagrant
       credential: vagrant
       sudo_password:
+      group: whirr

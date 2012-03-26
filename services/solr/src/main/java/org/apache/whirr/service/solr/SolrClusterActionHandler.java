@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.configuration.Configuration;
+import org.apache.commons.lang.StringUtils;
 import org.apache.whirr.Cluster;
 import org.apache.whirr.Cluster.Instance;
 import org.apache.whirr.ClusterSpec;
@@ -35,6 +36,7 @@ import org.apache.whirr.service.ClusterActionHandlerSupport;
 import org.apache.whirr.service.FirewallManager.Rule;
 import org.apache.whirr.service.zookeeper.ZooKeeperCluster;
 import static org.apache.whirr.service.zookeeper.ZooKeeperClusterActionHandler.ZOOKEEPER_ROLE;
+
 import org.jclouds.crypto.CryptoStreams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,11 +50,13 @@ public class SolrClusterActionHandler extends ClusterActionHandlerSupport {
 
   public final static String SOLR_ROLE = "solr";
 
-  final static String CONFIG = "whirr-solr-default.properties";
+  final static String SOLR_DEFAULT_CONFIG = "whirr-solr-default.properties";
 
   final static String SOLR_HOME = "/usr/local/solr";
 
   final static String SOLR_CONF_DESTINATION = SOLR_HOME + "/conf";
+
+  // TODO: Create constants for solr properties
 
   @Override
   public String getRole() {
@@ -61,8 +65,7 @@ public class SolrClusterActionHandler extends ClusterActionHandlerSupport {
 
   @Override
   protected void beforeBootstrap(ClusterActionEvent event) throws IOException {
-    ClusterSpec clusterSpec = event.getClusterSpec();
-    Configuration config = getConfiguration(clusterSpec, CONFIG);
+    Configuration config = getConfiguration(event.getClusterSpec(), SOLR_DEFAULT_CONFIG);
 
     String solrTarball = config.getString("whirr.solr.tarball");
     if(!solrTarball.matches("^.*apache-solr-.*(tgz|tar\\.gz)$")) {
@@ -85,13 +88,27 @@ public class SolrClusterActionHandler extends ClusterActionHandlerSupport {
 
     ClusterSpec clusterSpec = event.getClusterSpec();
     Cluster cluster = event.getCluster();
-    Configuration config = getConfiguration(clusterSpec, CONFIG);
+    Configuration config = getConfiguration(clusterSpec, SOLR_DEFAULT_CONFIG);
 
     // Validate the config
     int jettyPort = config.getInt("whirr.solr.jetty.port");
     int jettyStopPort = config.getInt("whirr.solr.jetty.stop.port");
-    if(jettyPort == jettyStopPort) {
+    
+    if (jettyPort == 0) {
+      throw new IllegalArgumentException("Must specify Jetty's port! (whirr.solr.jetty.port)");
+    }
+
+    if (jettyStopPort == 0) {
+      throw new IllegalArgumentException("Must specify Jetty's stop port! (whirr.solr.jetty.stop.port)");
+    }
+
+    if (jettyPort == jettyStopPort) {
       throw new IllegalArgumentException("Jetty's port and the stop port must be different");
+    }
+
+    String solrConfigTarballUrl = config.getString("whirr.solr.config.tarball.url");
+    if (StringUtils.isBlank(solrConfigTarballUrl)) {
+      throw new IllegalArgumentException("Must specify Solr tarball! (whirr.solr.config.tarball.url)");
     }
 
     // Check for ZooKeeper
@@ -108,10 +125,11 @@ public class SolrClusterActionHandler extends ClusterActionHandlerSupport {
   protected void beforeStart(ClusterActionEvent event) throws IOException {
     ClusterSpec clusterSpec = event.getClusterSpec();
     Cluster cluster = event.getCluster();
-    Configuration config = getConfiguration(clusterSpec, CONFIG);
+    Configuration config = getConfiguration(clusterSpec, SOLR_DEFAULT_CONFIG);
 
-    String solrConfigTarball = prepareRemoteFileUrl(event, config.getString("whirr.solr.config.tarball"));
-    addStatement(event, call("install_tarball", solrConfigTarball, SOLR_CONF_DESTINATION));
+    String solrConfigTarballUrl = prepareRemoteFileUrl(event, config.getString("whirr.solr.config.tarball.url"));
+    LOG.info("Preparing solr config tarball url {}", solrConfigTarballUrl);
+    addStatement(event, call("install_tarball_no_md5", solrConfigTarballUrl, SOLR_CONF_DESTINATION));
 
     int jettyPort = config.getInt("whirr.solr.jetty.port");
     int jettyStopPort = config.getInt("whirr.solr.jetty.stop.port");
@@ -139,7 +157,7 @@ public class SolrClusterActionHandler extends ClusterActionHandlerSupport {
   protected void afterStart(ClusterActionEvent event) throws IOException {
     ClusterSpec clusterSpec = event.getClusterSpec();
     Cluster cluster = event.getCluster();
-    Configuration config = getConfiguration(clusterSpec, CONFIG);
+    Configuration config = getConfiguration(clusterSpec, SOLR_DEFAULT_CONFIG);
     int jettyPort = config.getInt("whirr.solr.jetty.port");
     LOG.info("Completed configuration of {}", clusterSpec.getClusterName());
     LOG.info("Solr Hosts: {}", getHosts(cluster.getInstancesMatching(role(SOLR_ROLE)), jettyPort));
@@ -148,7 +166,7 @@ public class SolrClusterActionHandler extends ClusterActionHandlerSupport {
   @Override
   protected void beforeStop(ClusterActionEvent event) throws IOException {
     ClusterSpec clusterSpec = event.getClusterSpec();
-    Configuration config = getConfiguration(clusterSpec, CONFIG);
+    Configuration config = getConfiguration(clusterSpec, SOLR_DEFAULT_CONFIG);
     int jettyStopPort = config.getInt("whirr.solr.jetty.stop.port");
     String stopFunc = getStopFunction(config, getRole(), "stop_" + getRole());
     LOG.info("Stopping Solr");

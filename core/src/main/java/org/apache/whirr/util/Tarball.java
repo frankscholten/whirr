@@ -38,8 +38,7 @@ public class Tarball {
    * Creates a tarball from the source directory and writes it into the target directory.
    *
    * @param sourceDirectory directory whose files will be added to the tarball
-   * @param targetName directory where tarball will be written to
-   *
+   * @param targetName      directory where tarball will be written to
    * @throws IOException when an exception occurs on creating the tarball
    */
   public static void createFromDirectory(String sourceDirectory, String targetName) throws IOException {
@@ -54,7 +53,7 @@ public class Tarball {
       gzipOutputStream = new GzipCompressorOutputStream(bufferedOutputStream);
       tarArchiveOutputStream = new TarArchiveOutputStream(gzipOutputStream);
 
-      addFile(tarArchiveOutputStream, sourceDirectory, "");
+      addFilesInDirectory(tarArchiveOutputStream, sourceDirectory);
     } finally {
       if (tarArchiveOutputStream != null) {
         tarArchiveOutputStream.finish();
@@ -70,6 +69,19 @@ public class Tarball {
       }
       if (fileOutputStream != null) {
         fileOutputStream.close();
+      }
+    }
+  }
+
+  // TODO: Javadoc
+
+  private static void addFilesInDirectory(TarArchiveOutputStream tarOutputStream, String path) throws IOException {
+    File file = new File(path);
+    File[] children = file.listFiles();
+
+    if (children != null) {
+      for (File child : children) {
+        addFile(tarOutputStream, child.getAbsolutePath(), "/");
       }
     }
   }

@@ -91,6 +91,7 @@ public class StatementBuilder {
       scriptBuilder.addStatement(exec(writeVariableExporters));
 
       for (Statement statement : statements) {
+        LOG.debug("Adding statement: ", statement);
         scriptBuilder.addStatement(statement);
       }
 
